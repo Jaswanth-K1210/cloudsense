@@ -30,6 +30,11 @@ def health():
     return {"status": "ok"}
 
 
+@router.get("/version")
+def version():
+    return {"name": "cloudsense", "version": "1.0.0", "api": "v1"}
+
+
 @router.post("/reset")
 def reset(task_id: str = Query(...)):
     with _env_lock:
