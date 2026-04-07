@@ -4,8 +4,8 @@
 Reads environment variables:
     API_BASE_URL: LLM API endpoint (default: https://router.huggingface.co/v1)
     MODEL_NAME: Model to use (default: Qwen/Qwen2.5-72B-Instruct)
-    HF_TOKEN / API_KEY: Authentication token (no default)
-    IMAGE_NAME: Docker image reference (no default)
+    HF_TOKEN: Authentication token (no default)
+    LOCAL_IMAGE_NAME: Optional — used when launching env via from_docker_image()
 """
 
 import json
@@ -18,18 +18,20 @@ import requests
 from openai import OpenAI
 
 # ─── Environment Variables ───────────────────────────────────────────
-API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
-API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
-MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
-IMAGE_NAME = os.getenv("IMAGE_NAME")
-LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
-ENV_URL = os.getenv("ENV_URL") or "http://localhost:7860"
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-if not API_KEY:
-    sys.exit("ERROR: HF_TOKEN (or API_KEY) environment variable is required")
+# Optional — if you use from_docker_image():
+LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
+
+ENV_URL = os.getenv("ENV_URL", "http://localhost:7860")
+
+if not HF_TOKEN:
+    sys.exit("ERROR: HF_TOKEN environment variable is required")
 
 # ─── LLM Client ─────────────────────────────────────────────────────
-client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 
 SYSTEM_PROMPT = """You are a FinOps AI agent optimizing cloud infrastructure costs.
 
