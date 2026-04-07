@@ -3,14 +3,18 @@
 import threading
 
 from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from env.environment import CloudSenseEnv
 from env.tasks import TASKS
+from server.dashboard import DASHBOARD_HTML
 
 router = APIRouter()
 env = CloudSenseEnv()
 _env_lock = threading.Lock()
+
+DEFAULT_TASK_ID = "startup-cleanup"
 
 
 class ActionRequest(BaseModel):
@@ -20,8 +24,13 @@ class ActionRequest(BaseModel):
     reasoning: str = ""
 
 
-@router.get("/")
+@router.get("/", response_class=HTMLResponse)
 def root():
+    return DASHBOARD_HTML
+
+
+@router.get("/status")
+def status():
     return {"status": "ok", "name": "cloudsense", "version": "1.0.0"}
 
 
@@ -36,7 +45,7 @@ def version():
 
 
 @router.post("/reset")
-def reset(task_id: str = Query(...)):
+def reset(task_id: str = Query(default=DEFAULT_TASK_ID)):
     with _env_lock:
         try:
             obs = env.reset(task_id)

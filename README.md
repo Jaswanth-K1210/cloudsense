@@ -160,4 +160,22 @@ python inference.py
 | mid-size-audit | 0.50–0.80 | Requires prod safety awareness |
 | enterprise-finops | 0.30–0.65 | Complex deps and blast radius reasoning |
 
+## Baseline Results
+
+Reproduced via `inference.py` against the live environment with `Qwen/Qwen2.5-72B-Instruct` (Hugging Face Router):
+
+| Task | Steps | Score | Notes |
+|------|-------|-------|-------|
+| startup-cleanup | 6 | **0.94** | Top of expected range |
+| mid-size-audit | 10 | **0.78** | Within expected range |
+| enterprise-finops | 37 | **0.76** | Above expected range |
+
+Total wall-clock time for all 3 tasks: **~4 minutes** (well under the 20 min budget).
+
+To reproduce:
+```bash
+uvicorn server.app:app --port 7860 &
+HF_TOKEN=hf_xxx python inference.py
+```
+
 All pricing based on AWS us-east-1 on-demand rates as of Q1 2025.

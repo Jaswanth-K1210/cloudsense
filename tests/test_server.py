@@ -14,9 +14,25 @@ def client():
 def test_root(client):
     r = client.get("/")
     assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]
+    assert "CloudSense" in r.text
+
+
+def test_status(client):
+    r = client.get("/status")
+    assert r.status_code == 200
     data = r.json()
     assert data["status"] == "ok"
     assert data["name"] == "cloudsense"
+
+
+def test_reset_default_task(client):
+    """Validator pings POST /reset with no params — must return 200."""
+    r = client.post("/reset")
+    assert r.status_code == 200
+    data = r.json()
+    assert "task_id" in data
+    assert "resources" in data
 
 
 def test_health(client):
