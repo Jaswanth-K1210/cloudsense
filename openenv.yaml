@@ -1,0 +1,61 @@
+name: cloudsense
+description: "CloudSense: RL benchmark for training FinOps AI agents on cloud cost optimization with real AWS pricing and blast radius mechanics"
+version: "1.0.0"
+author: "CloudSense Team"
+
+environment:
+  type: docker
+  image: cloudsense
+  port: 7860
+
+tasks:
+  - id: startup-cleanup
+    difficulty: easy
+    description: "Optimize a small startup's dev/staging AWS account with 6 obviously oversized or unused resources. Total spend ~$627/mo, optimal ~$240/mo."
+    max_steps: 10
+    tags: ["finops", "cost-optimization", "beginner"]
+
+  - id: mid-size-audit
+    difficulty: medium
+    description: "Audit a mid-size company's mixed prod/dev AWS account with 15 resources. Must identify which resources to optimize and which to leave alone. Total spend ~$3,487/mo, optimal ~$1,700/mo."
+    max_steps: 20
+    tags: ["finops", "cost-optimization", "intermediate", "production-safety"]
+
+  - id: enterprise-finops
+    difficulty: hard
+    description: "Full FinOps review of an enterprise AWS account with 40 resources across prod/staging/dev. Complex dependencies, blast radius considerations, reserved instance management, and multi-service optimization. Total spend ~$14,230/mo, optimal ~$7,100/mo."
+    max_steps: 45
+    tags: ["finops", "cost-optimization", "advanced", "blast-radius", "dependencies"]
+
+endpoints:
+  reset: POST /reset?task_id={task_id}
+  step: POST /step
+  state: GET /state
+  health: GET /health
+  close: POST /close
+
+action_space:
+  type: json
+  schema:
+    action_type: "ActionType enum"
+    resource_id: "string"
+    new_config: "optional dict"
+    reasoning: "string"
+
+observation_space:
+  type: json
+  schema:
+    task_id: "string"
+    goal: "string"
+    account_id: "string"
+    resources: "list of CloudResource dicts"
+    monthly_cost_current: "float"
+    monthly_cost_optimized: "float"
+    total_possible_savings: "float"
+    actions_taken: "list of action dicts"
+    warnings: "list of strings"
+    step_number: "int"
+    max_steps: "int"
+    last_reward: "float"
+    last_action_error: "optional string"
+    info: "dict with blast_radius etc."

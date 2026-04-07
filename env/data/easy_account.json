@@ -1,0 +1,196 @@
+[
+  {
+    "resource_id": "res-easy-001",
+    "resource_type": "ec2",
+    "name": "dev-api-server",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "t3.2xlarge",
+      "vcpus": 8,
+      "memory_gb": 32
+    },
+    "utilization": {
+      "cpu_percent": 4.0,
+      "memory_percent": 8.0,
+      "network_mbps": 0.5
+    },
+    "monthly_cost": 242.94,
+    "tags": {
+      "team": "backend",
+      "project": "api-v2"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-easy-002",
+    "resource_type": "rds",
+    "name": "staging-analytics-db",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "db.r5.large",
+      "storage_gb": 500,
+      "engine": "postgres",
+      "multi_az": false
+    },
+    "utilization": {
+      "cpu_percent": 3.0,
+      "connections": 2,
+      "storage_used_gb": 12,
+      "iops": 10
+    },
+    "monthly_cost": 232.7,
+    "tags": {
+      "team": "data",
+      "project": "analytics"
+    },
+    "has_backups": true,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-easy-003",
+    "resource_type": "load_balancer",
+    "name": "old-staging-alb",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "type": "ALB",
+      "listeners": 1,
+      "target_groups": 0,
+      "active_targets": 0
+    },
+    "utilization": {
+      "requests_per_second": 0,
+      "active_connections": 0,
+      "healthy_targets": 0
+    },
+    "monthly_cost": 22.27,
+    "tags": {
+      "team": "platform",
+      "project": "legacy-migration"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-easy-004",
+    "resource_type": "load_balancer",
+    "name": "test-nlb-unused",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "type": "NLB",
+      "listeners": 0,
+      "target_groups": 0,
+      "active_targets": 0
+    },
+    "utilization": {
+      "requests_per_second": 0,
+      "active_connections": 0,
+      "healthy_targets": 0
+    },
+    "monthly_cost": 22.27,
+    "tags": {
+      "team": "backend",
+      "project": "load-test"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-easy-005",
+    "resource_type": "s3",
+    "name": "dev-log-archive",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "storage_class": "STANDARD",
+      "size_gb": 2000,
+      "versioning": false,
+      "lifecycle_policy": null
+    },
+    "utilization": {
+      "access_frequency": "rare",
+      "last_accessed_days_ago": 90,
+      "get_requests_per_day": 5
+    },
+    "monthly_cost": 46.0,
+    "tags": {
+      "team": "devops",
+      "project": "logging"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "write_heavy_read_rare",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-easy-006",
+    "resource_type": "ec2",
+    "name": "staging-worker",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "t3.large",
+      "vcpus": 2,
+      "memory_gb": 8
+    },
+    "utilization": {
+      "cpu_percent": 2.0,
+      "memory_percent": 5.0,
+      "network_mbps": 0.1
+    },
+    "monthly_cost": 60.74,
+    "tags": {
+      "team": "backend",
+      "project": "batch-jobs"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "business_hours",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-easy-007",
+    "resource_type": "ec2",
+    "name": "critical-batch-runner",
+    "environment": "prod",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "t3.medium",
+      "vcpus": 2,
+      "memory_gb": 4
+    },
+    "utilization": {
+      "cpu_percent": 3,
+      "memory_percent": 15,
+      "network_mbps": 0.5
+    },
+    "monthly_cost": 30.37,
+    "tags": {
+      "team": "data-eng",
+      "purpose": "nightly-batch"
+    },
+    "has_backups": false,
+    "is_critical": true,
+    "dependencies": [],
+    "usage_pattern": "Nightly batch job \u2014 runs critical ETL pipeline at 2am. Low average CPU but 95% peak during batch window. Only instance running this job.",
+    "subnet": null
+  }
+]

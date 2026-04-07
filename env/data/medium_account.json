@@ -1,0 +1,434 @@
+[
+  {
+    "resource_id": "res-med-001",
+    "resource_type": "ec2",
+    "name": "prod-web-primary",
+    "environment": "prod",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "m5.xlarge",
+      "vcpus": 4,
+      "memory_gb": 16
+    },
+    "utilization": {
+      "cpu_percent": 5.0,
+      "memory_percent": 12.0,
+      "network_mbps": 2.0
+    },
+    "monthly_cost": 140.16,
+    "tags": {
+      "team": "platform",
+      "project": "web-app",
+      "note": "DO NOT TOUCH - seasonal traffic spikes"
+    },
+    "has_backups": true,
+    "is_critical": true,
+    "dependencies": [
+      "res-med-005"
+    ],
+    "usage_pattern": "seasonal_spikes",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-002",
+    "resource_type": "rds",
+    "name": "prod-db-replica",
+    "environment": "prod",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "db.r5.large",
+      "storage_gb": 200,
+      "engine": "mysql",
+      "multi_az": false,
+      "role": "read_replica"
+    },
+    "utilization": {
+      "cpu_percent": 8.0,
+      "connections": 5,
+      "storage_used_gb": 180,
+      "iops": 50
+    },
+    "monthly_cost": 198.2,
+    "tags": {
+      "team": "data",
+      "project": "core-db",
+      "purpose": "failover-replica"
+    },
+    "has_backups": true,
+    "is_critical": true,
+    "dependencies": [
+      "res-med-003"
+    ],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-003",
+    "resource_type": "rds",
+    "name": "prod-db-primary",
+    "environment": "prod",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "db.r5.xlarge",
+      "storage_gb": 500,
+      "engine": "mysql",
+      "multi_az": true
+    },
+    "utilization": {
+      "cpu_percent": 45.0,
+      "connections": 120,
+      "storage_used_gb": 420,
+      "iops": 3000
+    },
+    "monthly_cost": 407.9,
+    "tags": {
+      "team": "data",
+      "project": "core-db"
+    },
+    "has_backups": true,
+    "is_critical": true,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-004",
+    "resource_type": "ec2",
+    "name": "prod-api-gateway",
+    "environment": "prod",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "c5.xlarge",
+      "vcpus": 4,
+      "memory_gb": 8,
+      "in_asg": true,
+      "asg_name": "prod-api-asg"
+    },
+    "utilization": {
+      "cpu_percent": 65.0,
+      "memory_percent": 55.0,
+      "network_mbps": 150.0
+    },
+    "monthly_cost": 124.1,
+    "tags": {
+      "team": "platform",
+      "project": "api",
+      "aws:autoscaling:groupName": "prod-api-asg"
+    },
+    "has_backups": true,
+    "is_critical": true,
+    "dependencies": [
+      "res-med-005"
+    ],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-005",
+    "resource_type": "load_balancer",
+    "name": "prod-main-alb",
+    "environment": "prod",
+    "region": "us-east-1",
+    "current_config": {
+      "type": "ALB",
+      "listeners": 2,
+      "target_groups": 3,
+      "active_targets": 4
+    },
+    "utilization": {
+      "requests_per_second": 500,
+      "active_connections": 200,
+      "healthy_targets": 4
+    },
+    "monthly_cost": 22.27,
+    "tags": {
+      "team": "platform",
+      "project": "web-app"
+    },
+    "has_backups": false,
+    "is_critical": true,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-006",
+    "resource_type": "ec2",
+    "name": "dev-ml-training",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "r5.2xlarge",
+      "vcpus": 8,
+      "memory_gb": 64
+    },
+    "utilization": {
+      "cpu_percent": 3.0,
+      "memory_percent": 4.0,
+      "network_mbps": 0.2
+    },
+    "monthly_cost": 367.92,
+    "tags": {
+      "team": "ml",
+      "project": "experiment-v3"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "business_hours",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-007",
+    "resource_type": "ec2",
+    "name": "staging-batch-worker",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "m5.2xlarge",
+      "vcpus": 8,
+      "memory_gb": 32
+    },
+    "utilization": {
+      "cpu_percent": 6.0,
+      "memory_percent": 10.0,
+      "network_mbps": 1.0
+    },
+    "monthly_cost": 280.32,
+    "tags": {
+      "team": "backend",
+      "project": "batch-processing"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "business_hours",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-008",
+    "resource_type": "kubernetes",
+    "name": "dev-k8s-cluster",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "node_type": "m5.large",
+      "node_count": 8,
+      "autoscaling": false
+    },
+    "utilization": {
+      "cpu_percent": 10.0,
+      "memory_percent": 15.0,
+      "pod_count": 8,
+      "pod_capacity": 160
+    },
+    "monthly_cost": 633.64,
+    "tags": {
+      "team": "platform",
+      "project": "microservices-dev"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-009",
+    "resource_type": "rds",
+    "name": "dev-test-db",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "db.r5.xlarge",
+      "storage_gb": 500,
+      "engine": "postgres",
+      "multi_az": false
+    },
+    "utilization": {
+      "cpu_percent": 2.0,
+      "connections": 1,
+      "storage_used_gb": 5,
+      "iops": 5
+    },
+    "monthly_cost": 407.9,
+    "tags": {
+      "team": "backend",
+      "project": "testing"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "business_hours",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-010",
+    "resource_type": "s3",
+    "name": "staging-data-lake",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "storage_class": "STANDARD",
+      "size_gb": 20000,
+      "versioning": true,
+      "lifecycle_policy": null
+    },
+    "utilization": {
+      "access_frequency": "rare",
+      "last_accessed_days_ago": 60,
+      "get_requests_per_day": 10
+    },
+    "monthly_cost": 460.0,
+    "tags": {
+      "team": "data",
+      "project": "data-lake"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "write_heavy_read_rare",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-011",
+    "resource_type": "load_balancer",
+    "name": "staging-unused-alb",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "type": "ALB",
+      "listeners": 1,
+      "target_groups": 0,
+      "active_targets": 0
+    },
+    "utilization": {
+      "requests_per_second": 0,
+      "active_connections": 0,
+      "healthy_targets": 0
+    },
+    "monthly_cost": 22.27,
+    "tags": {
+      "team": "platform",
+      "project": "old-staging"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-012",
+    "resource_type": "ec2",
+    "name": "dev-jenkins-ci",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "m5.xlarge",
+      "vcpus": 4,
+      "memory_gb": 16
+    },
+    "utilization": {
+      "cpu_percent": 15.0,
+      "memory_percent": 20.0,
+      "network_mbps": 5.0
+    },
+    "monthly_cost": 140.16,
+    "tags": {
+      "team": "devops",
+      "project": "ci-cd"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "business_hours",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-013",
+    "resource_type": "ec2",
+    "name": "dev-monitoring",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "t3.xlarge",
+      "vcpus": 4,
+      "memory_gb": 16
+    },
+    "utilization": {
+      "cpu_percent": 8.0,
+      "memory_percent": 12.0,
+      "network_mbps": 0.5
+    },
+    "monthly_cost": 121.47,
+    "tags": {
+      "team": "devops",
+      "project": "monitoring"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-014",
+    "resource_type": "ec2",
+    "name": "staging-cache-server",
+    "environment": "staging",
+    "region": "us-east-1",
+    "current_config": {
+      "instance_type": "r5.large",
+      "vcpus": 2,
+      "memory_gb": 16,
+      "reservation_status": "expiring_30_days"
+    },
+    "utilization": {
+      "cpu_percent": 35.0,
+      "memory_percent": 60.0,
+      "network_mbps": 10.0
+    },
+    "monthly_cost": 91.98,
+    "tags": {
+      "team": "backend",
+      "project": "caching",
+      "ri_expiry": "2025-04-15"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "always_on",
+    "subnet": null
+  },
+  {
+    "resource_id": "res-med-015",
+    "resource_type": "s3",
+    "name": "cloudwatch-log-exports",
+    "environment": "dev",
+    "region": "us-east-1",
+    "current_config": {
+      "storage_class": "STANDARD",
+      "size_gb": 3000,
+      "versioning": false,
+      "lifecycle_policy": null,
+      "purpose": "cloudwatch-log-archive"
+    },
+    "utilization": {
+      "access_frequency": "never",
+      "last_accessed_days_ago": 180,
+      "get_requests_per_day": 0
+    },
+    "monthly_cost": 69.0,
+    "tags": {
+      "team": "devops",
+      "project": "logging",
+      "retention": "none"
+    },
+    "has_backups": false,
+    "is_critical": false,
+    "dependencies": [],
+    "usage_pattern": "write_only",
+    "subnet": null
+  }
+]
