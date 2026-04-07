@@ -5,308 +5,641 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CloudSense — FinOps RL Benchmark</title>
+<title>CloudSense // FinOps RL Benchmark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b1020;
-    --panel: #121a36;
-    --panel-2: #182245;
-    --text: #e6ecff;
-    --muted: #9aa5c4;
-    --accent: #5b9bff;
-    --accent-2: #57d6a4;
-    --warn: #ffb347;
-    --danger: #ff6b6b;
-    --border: #243056;
+    --ink:      #0e0d0b;
+    --ink-2:    #15130f;
+    --surface:  #1a1814;
+    --rule:     #2b2822;
+    --rule-2:   #3a3630;
+    --paper:    #ece8df;
+    --paper-2:  #c9c3b4;
+    --muted:    #7d7669;
+    --amber:    #e89a2b;
+    --amber-2:  #ffc467;
+    --green:    #7fa65a;
+    --red:      #c85a4a;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: radial-gradient(ellipse at top, #1a2547 0%, var(--bg) 60%);
-    color: var(--text);
-    min-height: 100vh;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "ss02";
+    overflow-x: hidden;
   }
-  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
-  header { text-align: center; margin-bottom: 40px; }
-  .logo { font-size: 56px; margin-bottom: 8px; }
-  h1 {
-    margin: 0 0 8px;
-    font-size: 36px;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .tagline { color: var(--muted); font-size: 16px; max-width: 640px; margin: 0 auto; line-height: 1.5; }
-  .badges { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
-  .badge {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  }
-  .grid { display: grid; gap: 20px; }
-  .grid-3 { grid-template-columns: repeat(3, 1fr); }
-  .grid-2 { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 760px) {
-    .grid-3, .grid-2 { grid-template-columns: 1fr; }
-  }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-  }
-  .stat { text-align: center; }
-  .stat .num {
-    font-size: 36px;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .stat .label { color: var(--muted); font-size: 13px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .section { margin-top: 40px; }
-  .section h2 {
-    font-size: 20px;
-    margin: 0 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section h2::before {
+  /* Grain overlay */
+  body::before {
     content: "";
-    width: 4px;
-    height: 18px;
-    background: linear-gradient(to bottom, var(--accent), var(--accent-2));
-    border-radius: 2px;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(232,154,43,0.08), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(232,154,43,0.04), transparent 45%);
   }
-  .task {
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.85 0 0 0 0 0.7 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    opacity: 0.25;
+  }
+  .page { position: relative; z-index: 3; max-width: 1240px; margin: 0 auto; padding: 28px 40px 80px; }
+
+  /* ─── Top bar ─── */
+  .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--panel-2);
-    margin-bottom: 10px;
-  }
-  .task .meta { display: flex; flex-direction: column; gap: 4px; }
-  .task .name { font-weight: 600; font-size: 15px; }
-  .task .desc { color: var(--muted); font-size: 12px; }
-  .task .right { display: flex; align-items: center; gap: 14px; }
-  .pill {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 999px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
   }
-  .pill.easy { background: rgba(87, 214, 164, 0.15); color: var(--accent-2); }
-  .pill.medium { background: rgba(255, 179, 71, 0.15); color: var(--warn); }
-  .pill.hard { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
-  .score {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  .topbar .mark { color: var(--paper); }
+  .topbar .mark b { color: var(--amber); font-weight: 500; }
+  .status { display: inline-flex; align-items: center; gap: 8px; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgba(127,166,90,0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(127,166,90,0.55); }
+    70%  { box-shadow: 0 0 0 9px rgba(127,166,90,0);   }
+    100% { box-shadow: 0 0 0 0 rgba(127,166,90,0);     }
+  }
+
+  /* ─── Hero ─── */
+  .hero {
+    position: relative;
+    padding: 70px 0 50px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero .eyebrow::before {
+    content: "";
+    width: 28px; height: 1px; background: var(--amber);
+  }
+  .hero h1 {
+    font-family: "Fraunces", ui-serif, Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(72px, 13vw, 200px);
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+    margin: 0;
+    color: var(--paper);
+    font-variation-settings: "opsz" 144;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--amber);
+  }
+  .hero .lede {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--rule);
+  }
+  .hero .lede p {
+    max-width: 62ch;
+    color: var(--paper-2);
     font-size: 14px;
-    color: var(--accent);
-    min-width: 48px;
+    margin: 0;
+  }
+  .hero .lede p b { color: var(--paper); font-weight: 500; }
+  .meta-block {
+    text-align: right;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .meta-block span { color: var(--paper); }
+
+  /* ─── Ticker strip ─── */
+  .ticker {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ticker > div {
+    padding: 26px 24px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ticker > div:last-child { border-right: none; }
+  .ticker .k {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ticker .v {
+    font-family: "Fraunces", serif;
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    font-variation-settings: "opsz" 72;
+  }
+  .ticker .v .unit { font-size: 14px; color: var(--amber); margin-left: 4px; font-family: "JetBrains Mono", monospace; }
+  .ticker .sub { font-size: 11px; color: var(--paper-2); }
+
+  /* ─── Section heading ─── */
+  .section {
+    padding: 56px 0 28px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .section-head .idx {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+  .section-head h2 {
+    font-family: "Fraunces", serif;
+    font-weight: 300;
+    font-size: 36px;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--paper);
+  }
+  .section-head h2 em { font-style: italic; color: var(--amber); }
+
+  /* ─── Task cards ─── */
+  .tasks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+  .task {
+    padding: 28px 26px 24px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: transparent;
+    transition: background 300ms ease;
+    position: relative;
+  }
+  .task:last-child { border-right: none; }
+  .task:hover { background: var(--ink-2); }
+  .task:hover .arrow { transform: translateX(4px); color: var(--amber); }
+  .task .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .task .tag::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--amber);
+    display: inline-block;
+  }
+  .task.easy   .tag::before { background: var(--green); }
+  .task.medium .tag::before { background: var(--amber); }
+  .task.hard   .tag::before { background: var(--red);   }
+  .task h3 {
+    font-family: "Fraunces", serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin: 0;
+    color: var(--paper);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .task p {
+    color: var(--paper-2);
+    font-size: 12.5px;
+    margin: 0;
+    min-height: 70px;
+  }
+  .task .stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .task .stats b {
+    display: block;
+    font-family: "Fraunces", serif;
+    font-size: 22px;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--paper);
+    margin-top: 4px;
+    text-transform: none;
+    letter-spacing: -0.01em;
+  }
+  .task .stats .score b { color: var(--amber); }
+  .task .arrow {
+    position: absolute;
+    top: 26px; right: 24px;
+    color: var(--muted);
+    transition: transform 300ms ease, color 300ms ease;
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  /* ─── Two-col: actions + endpoints ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+  }
+  .col h4 {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+  }
+  .list .row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--rule);
+    align-items: baseline;
+  }
+  .list .row:last-child { border-bottom: none; }
+  .list .num {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .list .name {
+    color: var(--paper);
+    font-size: 13px;
+  }
+  .list .name b {
+    color: var(--amber);
+    font-weight: 500;
+  }
+  .list .desc {
+    font-size: 11.5px;
+    color: var(--paper-2);
     text-align: right;
   }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-  td code {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    font-size: 13px;
-    color: var(--accent);
-    background: var(--panel-2);
-    padding: 2px 6px;
-    border-radius: 4px;
+  .endpoint {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px dashed var(--rule);
+    align-items: center;
   }
+  .endpoint:last-child { border-bottom: none; }
   .method {
-    display: inline-block;
-    font-family: ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    padding: 4px 0;
+    text-align: center;
+    color: var(--ink);
+    background: var(--paper);
     font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 4px;
-    min-width: 46px;
-    text-align: center;
   }
-  .method.get { background: rgba(91, 155, 255, 0.18); color: var(--accent); }
-  .method.post { background: rgba(87, 214, 164, 0.18); color: var(--accent-2); }
-  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; justify-content: center; }
-  .btn {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 18px;
-    border-radius: 10px;
+  .method.post { background: var(--amber); }
+  .endpoint a {
+    color: var(--paper);
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.15s ease;
+    font-size: 13px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 200ms, color 200ms;
   }
-  .btn:hover { background: var(--panel-2); border-color: var(--accent); }
-  .btn.primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #0b1020;
-    border: none;
-    font-weight: 600;
+  .endpoint a:hover {
+    color: var(--amber);
+    border-color: var(--amber);
   }
-  .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(91, 155, 255, 0.3); }
-  footer {
-    text-align: center;
-    margin-top: 60px;
+  .endpoint span.note {
+    display: block;
+    font-size: 10.5px;
     color: var(--muted);
-    font-size: 12px;
-  }
-  .feature {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .feature .icon {
-    font-size: 22px;
-    line-height: 1;
     margin-top: 2px;
   }
-  .feature .body strong { display: block; margin-bottom: 4px; color: var(--text); }
-  .feature .body span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+  /* ─── CTA footer ─── */
+  .cta {
+    padding: 72px 0 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+    border-bottom: 1px solid var(--rule);
+  }
+  .cta h3 {
+    font-family: "Fraunces", serif;
+    font-weight: 300;
+    font-size: clamp(44px, 6vw, 78px);
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin: 0;
+    color: var(--paper);
+    max-width: 14ch;
+  }
+  .cta h3 em { font-style: italic; color: var(--amber); }
+  .btns { display: flex; flex-direction: column; gap: 10px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding: 14px 20px;
+    border: 1px solid var(--rule-2);
+    color: var(--paper);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: all 200ms ease;
+    min-width: 240px;
+  }
+  .btn:hover {
+    background: var(--amber);
+    color: var(--ink);
+    border-color: var(--amber);
+  }
+  .btn.primary {
+    background: var(--amber);
+    color: var(--ink);
+    border-color: var(--amber);
+  }
+  .btn.primary:hover {
+    background: var(--amber-2);
+    border-color: var(--amber-2);
+  }
+  .btn .ar { font-family: "JetBrains Mono", monospace; }
+
+  /* ─── Footer ─── */
+  footer.foot {
+    padding-top: 26px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  footer.foot a { color: var(--muted); text-decoration: none; }
+  footer.foot a:hover { color: var(--amber); }
+
+  /* ─── Reveal ─── */
+  .reveal { opacity: 0; transform: translateY(20px); animation: rise 900ms cubic-bezier(.2,.7,.1,1) forwards; }
+  .r1 { animation-delay: 80ms; }
+  .r2 { animation-delay: 200ms; }
+  .r3 { animation-delay: 340ms; }
+  .r4 { animation-delay: 460ms; }
+  .r5 { animation-delay: 580ms; }
+  .r6 { animation-delay: 700ms; }
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 900px) {
+    .page { padding: 20px 22px 60px; }
+    .hero { padding: 40px 0 36px; }
+    .hero .lede { grid-template-columns: 1fr; gap: 20px; }
+    .meta-block { text-align: left; }
+    .ticker { grid-template-columns: repeat(2, 1fr); }
+    .ticker > div:nth-child(2) { border-right: none; }
+    .ticker > div:nth-child(1), .ticker > div:nth-child(2) { border-bottom: 1px solid var(--rule); }
+    .tasks { grid-template-columns: 1fr; }
+    .task { border-right: none; border-bottom: 1px solid var(--rule); }
+    .task:last-child { border-bottom: none; }
+    .two-col { grid-template-columns: 1fr; gap: 40px; }
+    .cta { grid-template-columns: 1fr; }
+    .btn { min-width: auto; width: 100%; }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <div class="logo">☁️</div>
-    <h1>CloudSense</h1>
-    <p class="tagline">An OpenEnv-compatible RL benchmark for training and evaluating FinOps AI agents on cloud cost optimization. Real AWS pricing. Blast radius mechanics. Production-safety reasoning.</p>
-    <div class="badges">
-      <span class="badge">openenv</span>
-      <span class="badge">finops</span>
-      <span class="badge">v1.0.0</span>
-      <span class="badge">aws • us-east-1</span>
-    </div>
-  </header>
+<div class="page">
 
-  <div class="grid grid-3">
-    <div class="card stat">
-      <div class="num">3</div>
-      <div class="label">Tasks</div>
+  <!-- ───── Top bar ───── -->
+  <div class="topbar reveal r1">
+    <div class="mark">CLOUD<b>SENSE</b> &nbsp;/&nbsp; OPENENV BENCHMARK</div>
+    <div class="status"><span class="dot"></span> ENVIRONMENT ONLINE &nbsp;·&nbsp; V1.0.0</div>
+  </div>
+
+  <!-- ───── Hero ───── -->
+  <section class="hero">
+    <div class="eyebrow reveal r2">FINOPS · REINFORCEMENT LEARNING · Q1 2025</div>
+    <h1 class="reveal r3">Teach&nbsp;agents<br/>to spend <em>wisely.</em></h1>
+    <div class="lede reveal r4">
+      <p>
+        CloudSense is an OpenEnv-compatible RL benchmark that simulates real AWS accounts
+        with authentic pricing, utilization, and dependency graphs. Agents must identify
+        waste, optimize spend, and reason about <b>blast radius</b> &mdash; the cascading
+        infrastructure impact of every action &mdash; without breaking production.
+      </p>
+      <div class="meta-block">
+        Issue No. <span>001</span><br/>
+        Region <span>US-EAST-1</span><br/>
+        Pricing <span>ON-DEMAND</span><br/>
+        Model <span>QWEN 2.5 72B</span>
+      </div>
     </div>
-    <div class="card stat">
-      <div class="num">62</div>
-      <div class="label">Resources</div>
+  </section>
+
+  <!-- ───── Ticker strip ───── -->
+  <div class="ticker reveal r5">
+    <div>
+      <div class="k">Tasks</div>
+      <div class="v">03</div>
+      <div class="sub">Easy / Medium / Hard</div>
     </div>
-    <div class="card stat">
-      <div class="num">9</div>
-      <div class="label">Action Types</div>
+    <div>
+      <div class="k">Resources</div>
+      <div class="v">61<span class="unit">total</span></div>
+      <div class="sub">6 · 15 · 40 per task</div>
+    </div>
+    <div>
+      <div class="k">Monthly spend</div>
+      <div class="v">$18.3<span class="unit">k</span></div>
+      <div class="sub">Summed across accounts</div>
+    </div>
+    <div>
+      <div class="k">Blast levels</div>
+      <div class="v">05</div>
+      <div class="sub">None → Critical</div>
     </div>
   </div>
 
-  <div class="section">
-    <h2>Tasks</h2>
-    <div class="task">
-      <div class="meta">
-        <div class="name">startup-cleanup</div>
-        <div class="desc">7 resources · ~$627/mo · obvious dev/staging waste</div>
+  <!-- ───── Tasks ───── -->
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <div class="idx">§ 01 &nbsp;·&nbsp; CURRICULUM</div>
       </div>
-      <div class="right">
-        <span class="pill easy">easy</span>
-        <span class="score">0.94</span>
-      </div>
+      <h2>Three <em>escalating</em> scenarios</h2>
     </div>
-    <div class="task">
-      <div class="meta">
-        <div class="name">mid-size-audit</div>
-        <div class="desc">15 resources · ~$3,487/mo · prod safety required</div>
-      </div>
-      <div class="right">
-        <span class="pill medium">medium</span>
-        <span class="score">0.81</span>
-      </div>
-    </div>
-    <div class="task">
-      <div class="meta">
-        <div class="name">enterprise-finops</div>
-        <div class="desc">40 resources · ~$14,230/mo · dependencies + blast radius</div>
-      </div>
-      <div class="right">
-        <span class="pill hard">hard</span>
-        <span class="score">0.76</span>
-      </div>
-    </div>
-    <p style="color: var(--muted); font-size: 12px; margin-top: 8px;">Baseline scores from <code style="background: var(--panel-2); padding: 2px 6px; border-radius: 4px; color: var(--accent);">Qwen/Qwen2.5-72B-Instruct</code> via Hugging Face Router.</p>
-  </div>
 
-  <div class="section">
-    <h2>Why this matters</h2>
-    <div class="grid grid-2">
-      <div class="card feature">
-        <div class="icon">💸</div>
-        <div class="body">
-          <strong>Real AWS pricing</strong>
-          <span>Actual us-east-1 on-demand rates (Q1 2025) for EC2, RDS, S3, ELB, NAT, EBS, ES, K8s.</span>
+    <div class="tasks">
+      <div class="task easy">
+        <div class="tag">EASY · STARTUP</div>
+        <h3>Startup<br/>Cleanup</h3>
+        <p>A 6-resource dev/staging account. Obvious waste, no production, no dependencies. Tests basic cost-optimization fundamentals.</p>
+        <div class="stats">
+          <div>Steps<b>10</b></div>
+          <div>Spend<b>$627</b></div>
+          <div class="score">Baseline<b>0.94</b></div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="task medium">
+        <div class="tag">MEDIUM · MID-SIZE</div>
+        <h3>Mid-Size<br/>Audit</h3>
+        <p>15 resources mixing prod and non-prod. Must distinguish seasonal spikes, failover replicas, and expiring reservations from genuine waste.</p>
+        <div class="stats">
+          <div>Steps<b>20</b></div>
+          <div>Spend<b>$3.5k</b></div>
+          <div class="score">Baseline<b>0.78</b></div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="task hard">
+        <div class="tag">HARD · ENTERPRISE</div>
+        <h3>Enterprise<br/>FinOps</h3>
+        <p>40 interdependent resources. Cross-region replication, oversized Elasticsearch, NAT Gateway traps. Requires blast-radius reasoning.</p>
+        <div class="stats">
+          <div>Steps<b>45</b></div>
+          <div>Spend<b>$14.2k</b></div>
+          <div class="score">Baseline<b>0.76</b></div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Actions + Endpoints ───── -->
+  <section class="section">
+    <div class="section-head">
+      <div><div class="idx">§ 02 &nbsp;·&nbsp; REFERENCE</div></div>
+      <h2>Action space <em>&amp;</em> API</h2>
+    </div>
+
+    <div class="two-col">
+      <div class="col">
+        <h4>Action Space / 09 verbs</h4>
+        <div class="list">
+          <div class="row"><div class="num">01</div><div class="name"><b>rightsize_resource</b></div><div class="desc">shrink to cheaper instance type</div></div>
+          <div class="row"><div class="num">02</div><div class="name"><b>terminate_resource</b></div><div class="desc">remove unused infrastructure</div></div>
+          <div class="row"><div class="num">03</div><div class="name"><b>add_lifecycle_policy</b></div><div class="desc">S3 tiering · ~70% savings</div></div>
+          <div class="row"><div class="num">04</div><div class="name"><b>enable_autoscaling</b></div><div class="desc">dynamic capacity · ~20% savings</div></div>
+          <div class="row"><div class="num">05</div><div class="name"><b>purchase_reservation</b></div><div class="desc">steady workloads · ~30% savings</div></div>
+          <div class="row"><div class="num">06</div><div class="name"><b>change_storage_class</b></div><div class="desc">Glacier / IA tiers</div></div>
+          <div class="row"><div class="num">07</div><div class="name"><b>schedule_uptime</b></div><div class="desc">business-hours only</div></div>
+          <div class="row"><div class="num">08</div><div class="name"><b>request_more_info</b></div><div class="desc">defer, gather context</div></div>
+          <div class="row"><div class="num">09</div><div class="name"><b>skip_resource</b></div><div class="desc">safe for critical prod</div></div>
         </div>
       </div>
-      <div class="card feature">
-        <div class="icon">💥</div>
-        <div class="body">
-          <strong>Blast radius mechanic</strong>
-          <span>Every action computes cascading impact through dependency graphs. Agents that reason about it earn bonus reward.</span>
+
+      <div class="col">
+        <h4>HTTP Endpoints / OpenEnv</h4>
+        <div class="endpoint">
+          <div class="method">GET</div>
+          <div><a href="/health">/health</a><span class="note">liveness probe</span></div>
         </div>
-      </div>
-      <div class="card feature">
-        <div class="icon">🛡️</div>
-        <div class="body">
-          <strong>Production safety</strong>
-          <span>Critical prod resources must be skipped — terminating them costs −0.50. Distinguishes reasoning from optimization.</span>
+        <div class="endpoint">
+          <div class="method">GET</div>
+          <div><a href="/version">/version</a><span class="note">name · version · api level</span></div>
         </div>
-      </div>
-      <div class="card feature">
-        <div class="icon">📊</div>
-        <div class="body">
-          <strong>Multi-component reward</strong>
-          <span>Cost reduction + action correctness + safety + reasoning quality + blast radius awareness. Clamped to [0, 1].</span>
+        <div class="endpoint">
+          <div class="method">GET</div>
+          <div><a href="/tasks">/tasks</a><span class="note">list available scenarios</span></div>
+        </div>
+        <div class="endpoint">
+          <div class="method post">POST</div>
+          <div><a href="/docs#/default/reset_reset_post">/reset?task_id=&lt;id&gt;</a><span class="note">begin a new episode</span></div>
+        </div>
+        <div class="endpoint">
+          <div class="method post">POST</div>
+          <div><a href="/docs#/default/step_step_post">/step</a><span class="note">execute action · JSON body</span></div>
+        </div>
+        <div class="endpoint">
+          <div class="method">GET</div>
+          <div><a href="/state">/state</a><span class="note">current observation</span></div>
+        </div>
+        <div class="endpoint">
+          <div class="method post">POST</div>
+          <div><a href="/docs#/default/close_close_post">/close</a><span class="note">end current episode</span></div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="section">
-    <h2>API endpoints</h2>
-    <div class="card" style="padding: 4px 16px;">
-      <table>
-        <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><span class="method get">GET</span></td><td><code>/health</code></td><td>Health check</td></tr>
-          <tr><td><span class="method get">GET</span></td><td><code>/tasks</code></td><td>List available tasks</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/reset?task_id=&lt;id&gt;</code></td><td>Start episode (defaults to easy)</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/step</code></td><td>Execute action (JSON body)</td></tr>
-          <tr><td><span class="method get">GET</span></td><td><code>/state</code></td><td>Current observation</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/close</code></td><td>End episode</td></tr>
-        </tbody>
-      </table>
+  <!-- ───── CTA ───── -->
+  <section class="cta">
+    <h3>Run the<br/>benchmark<br/><em>yourself.</em></h3>
+    <div class="btns">
+      <a class="btn primary" href="/docs"><span>OPEN API DOCS</span><span class="ar">→</span></a>
+      <a class="btn" href="/tasks"><span>LIST TASKS</span><span class="ar">→</span></a>
+      <a class="btn" href="https://github.com/Jaswanth-K1210/cloudsense" target="_blank" rel="noopener"><span>SOURCE · GITHUB</span><span class="ar">↗</span></a>
+      <a class="btn" href="https://huggingface.co/spaces/Jaswanth-K/cloudsense" target="_blank" rel="noopener"><span>SPACE · HUGGING FACE</span><span class="ar">↗</span></a>
     </div>
-  </div>
+  </section>
 
-  <div class="actions">
-    <a class="btn primary" href="/docs">Open API Docs</a>
-    <a class="btn" href="/tasks">View tasks</a>
-    <a class="btn" href="/health">Health</a>
-    <a class="btn" href="https://github.com/Jaswanth-K1210/cloudsense" target="_blank" rel="noopener">GitHub</a>
-  </div>
-
-  <footer>
-    CloudSense · OpenEnv FinOps Benchmark · Pricing data Q1 2025
+  <footer class="foot">
+    <div>© CLOUDSENSE · OPENENV FINOPS BENCHMARK</div>
+    <div>AWS US-EAST-1 · ON-DEMAND · Q1 2025</div>
   </footer>
+
 </div>
 </body>
 </html>"""
