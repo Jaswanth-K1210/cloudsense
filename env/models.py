@@ -91,3 +91,8 @@ class StepResult(BaseModel):
     reward: float
     done: bool
     info: dict = Field(default_factory=dict)
+
+
+# Aliases following OpenEnv naming convention
+CloudSenseAction = CloudAction
+CloudSenseObservation = CloudObservation
